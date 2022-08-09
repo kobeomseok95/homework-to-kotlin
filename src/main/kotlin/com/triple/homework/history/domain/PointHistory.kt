@@ -1,5 +1,6 @@
-package com.triple.homework.domain
+package com.triple.homework.history.domain
 
+import com.triple.homework.common.BaseTimeEntity
 import java.util.*
 import javax.persistence.*
 
@@ -16,4 +17,4 @@ class PointHistory(
     @Enumerated(EnumType.STRING)
     val pointHistoryType: PointHistoryType,
 
-): BaseTimeEntity()
+    ): BaseTimeEntity()

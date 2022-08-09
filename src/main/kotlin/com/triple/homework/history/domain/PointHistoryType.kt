@@ -1,4 +1,4 @@
-package com.triple.homework.domain
+package com.triple.homework.history.domain
 
 enum class PointHistoryType(
 

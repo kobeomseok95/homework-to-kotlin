@@ -1,5 +1,6 @@
-package com.triple.homework.domain
+package com.triple.homework.review.domain
 
+import com.triple.homework.common.BaseTimeEntity
 import javax.persistence.Column
 import javax.persistence.Embedded
 import javax.persistence.Entity

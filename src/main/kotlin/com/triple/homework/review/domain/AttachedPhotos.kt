@@ -1,4 +1,4 @@
-package com.triple.homework.domain
+package com.triple.homework.review.domain
 
 import javax.persistence.Embeddable
 import javax.persistence.FetchType

@@ -1,5 +1,6 @@
-package com.triple.homework.domain
+package com.triple.homework.review.domain
 
+import com.triple.homework.common.BaseTimeEntity
 import java.util.*
 import javax.persistence.*
 
@@ -14,4 +15,4 @@ class AttachedPhoto(
     @JoinColumn(name = "REVIEW_ID")
     val review: Review,
 
-): BaseTimeEntity()
+    ): BaseTimeEntity()
