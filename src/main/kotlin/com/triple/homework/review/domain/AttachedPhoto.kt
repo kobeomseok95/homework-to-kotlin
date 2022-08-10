@@ -1,18 +1,12 @@
 package com.triple.homework.review.domain
 
-import com.triple.homework.common.BaseTimeEntity
 import java.util.*
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Embeddable
 
-@Entity
+@Embeddable
 class AttachedPhoto(
 
-    @Id
-    @Column(name = "ATTACHED_PHOTO_ID")
-    val id: UUID,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "REVIEW_ID")
-    val review: Review,
-
-    ): BaseTimeEntity()
+    @Column
+    val attachedPhotoId: UUID,
+)

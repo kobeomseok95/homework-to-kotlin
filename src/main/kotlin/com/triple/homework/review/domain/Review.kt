@@ -1,6 +1,7 @@
 package com.triple.homework.review.domain
 
 import com.triple.homework.common.BaseTimeEntity
+import java.util.*
 import javax.persistence.Column
 import javax.persistence.Embedded
 import javax.persistence.Entity
@@ -11,15 +12,15 @@ class Review(
 
    @Id
    @Column(name = "REVIEW_ID")
-   val id: Long,
+   val id: UUID,
 
-   val userId: Long,
+   val userId: UUID,
 
-   val placeId: Long,
+   val placeId: UUID,
 
-   val content: String?,
+   var content: String?,
 
    @Embedded
-   val attachedPhotos: AttachedPhotos
+   var attachedPhotos: AttachedPhotos?,
 
 ): BaseTimeEntity()
