@@ -1,4 +1,4 @@
-package com.triple.homework.review.domain
+package com.triple.homework.event.domain
 
 import java.util.*
 import javax.persistence.Column

@@ -1,21 +1,21 @@
-package com.triple.homework.review.service
+package com.triple.homework.event.service
 
 import com.triple.homework.common.exception.review.UserWrittenReviewException
-import com.triple.homework.review.domain.ReviewRepository
-import com.triple.homework.review.service.dto.request.ReviewRequestDto
+import com.triple.homework.event.domain.ReviewRepository
+import com.triple.homework.event.service.dto.request.ReviewRequestDto
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class ReviewService(
+@Transactional
+class ReviewEventService(
     private val reviewRepository: ReviewRepository,
-    private val reviewPointCalculateService: ReviewPointCalculateService,
+    private val pointCalculateService: PointCalculateService,
 ) {
 
-    @Transactional
     fun add(requestDto: ReviewRequestDto) {
         validateExistReview(requestDto)
-        val calculatedPoint = reviewPointCalculateService.writeReviewAndSaveHistory(requestDto)
+        pointCalculateService.calculateAddReviewPoint(requestDto)
         reviewRepository.save(requestDto.toReview())
     }
 
@@ -23,7 +23,7 @@ class ReviewService(
         if (reviewRepository.existsByUserIdAndPlaceId(requestDto.userId, requestDto.placeId)) {
             throw UserWrittenReviewException()
         }
-        if (reviewRepository.existsByReviewId(requestDto.reviewId)) {
+        if (reviewRepository.existsById(requestDto.reviewId)) {
             throw UserWrittenReviewException()
         }
     }

@@ -1,9 +1,9 @@
-package com.triple.homework.review.service
+package com.triple.homework.event.service
 
 import com.triple.homework.common.exception.review.UserWrittenReviewException
-import com.triple.homework.review.domain.Review
-import com.triple.homework.review.domain.ReviewRepository
-import com.triple.homework.review.service.dto.request.ReviewRequestDto
+import com.triple.homework.event.domain.Review
+import com.triple.homework.event.domain.ReviewRepository
+import com.triple.homework.event.service.dto.request.ReviewRequestDto
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -17,16 +17,16 @@ import org.junit.jupiter.api.extension.ExtendWith
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
-internal class ReviewServiceTest {
+internal class ReviewEventServiceTest {
 
     @MockK
     private lateinit var reviewRepository: ReviewRepository
 
     @MockK
-    private lateinit var reviewPointCalculateService: ReviewPointCalculateService
+    private lateinit var pointCalculateService: PointCalculateService
 
     @InjectMockKs
-    private lateinit var reviewService: ReviewService
+    private lateinit var reviewEventService: ReviewEventService
 
     @DisplayName("리뷰 작성 - 실패 / 유저가 이미 작성한 리뷰인 경우 추가할 수 없다.")
     @Test
@@ -39,12 +39,12 @@ internal class ReviewServiceTest {
             reviewId = UUID.randomUUID(),
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
-            attachedPhotoIds = listOf(UUID.randomUUID().toString()),
+            attachedPhotoIds = listOf(UUID.randomUUID()),
             content = "테스트",
         )
 
         assertThrows<UserWrittenReviewException> {
-            reviewService.add(requestDto)
+            reviewEventService.add(requestDto)
         }
         verify {
             reviewRepository.existsByUserIdAndPlaceId(requestDto.userId, requestDto.placeId)
@@ -59,22 +59,22 @@ internal class ReviewServiceTest {
             reviewRepository.existsByUserIdAndPlaceId(any(), any())
         } returns false
         every {
-            reviewRepository.existsByReviewId(any())
+            reviewRepository.existsById(any())
         } returns true
         val requestDto = ReviewRequestDto(
             reviewId = UUID.randomUUID(),
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
-            attachedPhotoIds = listOf(UUID.randomUUID().toString()),
+            attachedPhotoIds = listOf(UUID.randomUUID()),
             content = "테스트",
         )
 
         assertThrows<UserWrittenReviewException> {
-            reviewService.add(requestDto)
+            reviewEventService.add(requestDto)
         }
         verify {
             reviewRepository.existsByUserIdAndPlaceId(requestDto.userId, requestDto.placeId)
-            reviewRepository.existsByReviewId(requestDto.reviewId)
+            reviewRepository.existsById(requestDto.reviewId)
         }
     }
 
@@ -85,29 +85,26 @@ internal class ReviewServiceTest {
             reviewRepository.existsByUserIdAndPlaceId(any(), any())
         } returns false
         every {
-            reviewRepository.existsByReviewId(any())
+            reviewRepository.existsById(any())
         } returns false
         every {
             reviewRepository.save(any())
         } returns mockkClass(Review::class)
-        every {
-            reviewPointCalculateService.writeReviewAndSaveHistory(any())
-        } returns 3
         val requestDto = ReviewRequestDto(
             reviewId = UUID.randomUUID(),
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
-            attachedPhotoIds = listOf(UUID.randomUUID().toString()),
+            attachedPhotoIds = listOf(UUID.randomUUID()),
             content = "테스트",
         )
 
-        reviewService.add(requestDto)
+        reviewEventService.add(requestDto)
 
         verify {
             reviewRepository.existsByUserIdAndPlaceId(requestDto.userId, requestDto.placeId)
-            reviewRepository.existsByReviewId(requestDto.reviewId)
+            reviewRepository.existsById(requestDto.reviewId)
             reviewRepository.save(any())
-            reviewPointCalculateService.writeReviewAndSaveHistory(requestDto)
+            pointCalculateService.calculateAddReviewPoint(requestDto)
         }
     }
 }

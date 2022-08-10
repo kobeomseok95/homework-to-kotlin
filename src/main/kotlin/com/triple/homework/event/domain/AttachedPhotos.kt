@@ -1,4 +1,4 @@
-package com.triple.homework.review.domain
+package com.triple.homework.event.domain
 
 import javax.persistence.*
 

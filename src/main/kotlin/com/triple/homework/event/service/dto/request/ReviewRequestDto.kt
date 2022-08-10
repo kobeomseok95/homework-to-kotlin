@@ -1,15 +1,15 @@
-package com.triple.homework.review.service.dto.request
+package com.triple.homework.event.service.dto.request
 
-import com.triple.homework.review.domain.AttachedPhoto
-import com.triple.homework.review.domain.AttachedPhotos
-import com.triple.homework.review.domain.Review
+import com.triple.homework.event.domain.AttachedPhoto
+import com.triple.homework.event.domain.AttachedPhotos
+import com.triple.homework.event.domain.Review
 import java.util.*
 
 data class ReviewRequestDto(
 
     val reviewId: UUID,
     val content: String? = null,
-    val attachedPhotoIds: List<String>,
+    val attachedPhotoIds: List<UUID>,
     val userId: UUID,
     val placeId: UUID,
 ) {
@@ -28,7 +28,7 @@ data class ReviewRequestDto(
     private fun toAttachedPhotos() =
         AttachedPhotos(
             attachedPhotoIds.map {
-                AttachedPhoto(UUID.fromString(it))
+                AttachedPhoto(it)
             }.toList()
         )
 }
