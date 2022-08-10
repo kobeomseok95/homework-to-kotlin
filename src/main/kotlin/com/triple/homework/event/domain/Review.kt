@@ -8,7 +8,7 @@ import javax.persistence.Entity
 import javax.persistence.Id
 
 @Entity
-class Review(
+data class Review(
 
    @Id
    @Column(name = "REVIEW_ID")
@@ -18,9 +18,9 @@ class Review(
 
    val placeId: UUID,
 
-   var content: String?,
+   var content: String? = null,
 
    @Embedded
-   var attachedPhotos: AttachedPhotos?,
+   var attachedPhotos: AttachedPhotos? = null,
 
 ): BaseTimeEntity()

@@ -16,7 +16,8 @@ class ReviewEventService(
     fun add(requestDto: ReviewRequestDto) {
         validateExistReview(requestDto)
         pointCalculateService.calculateAddReviewPoint(requestDto)
-        reviewRepository.save(requestDto.toReview())
+        val review = requestDto.toReview()
+        reviewRepository.save(review)
     }
 
     private fun validateExistReview(requestDto: ReviewRequestDto) {
