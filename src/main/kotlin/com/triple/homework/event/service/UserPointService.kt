@@ -20,4 +20,8 @@ class UserPointService(
                 point = savedPoint.toLong(),
             ))
     }
+
+    fun changeUserPoint(userId: UUID, sumOf: Int) {
+        TODO("Not yet implemented")
+    }
 }

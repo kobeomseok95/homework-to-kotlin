@@ -1,17 +1,18 @@
 package com.triple.homework.event.service
 
+import com.triple.homework.common.exception.review.ReviewNotFoundException
+import com.triple.homework.common.exception.review.ReviewerNotEqualsException
 import com.triple.homework.common.exception.review.UserWrittenReviewException
-import com.triple.homework.event.domain.PointHistory
-import com.triple.homework.event.domain.PointHistoryRepository
-import com.triple.homework.event.domain.PointType
-import com.triple.homework.event.domain.ReviewRepository
+import com.triple.homework.event.domain.*
 import com.triple.homework.event.service.dto.request.ReviewRequestDto
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.data.repository.findByIdOrNull
 import java.util.*
 
 internal class ReviewEventServiceTest {
@@ -133,5 +134,120 @@ internal class ReviewEventServiceTest {
                 }
             )
         }
+    }
+
+    @DisplayName("리뷰 수정 - 실패 / 리뷰가 없을 경우")
+    @Test
+    fun review_modify_fail_review_not_found() {
+
+        val requestDto = ReviewRequestDto(
+            reviewId = UUID.randomUUID(),
+            userId = UUID.randomUUID(),
+            placeId = UUID.randomUUID(),
+            attachedPhotoIds = listOf(UUID.randomUUID()),
+            content = "테스트",
+        )
+        every {
+            reviewRepository.findByIdOrNull(requestDto.reviewId)
+        } returns null
+
+        assertThrows<ReviewNotFoundException> {
+            reviewEventService.modify(requestDto)
+        }
+    }
+
+    @DisplayName("리뷰 수정 - 실패 / 찾은 리뷰의 작성자가 맞지 않을 경우 예외 발생")
+    @Test
+    fun review_modify_fail_not_equals_reviewer() {
+
+        val requestDto = ReviewRequestDto(
+            reviewId = UUID.randomUUID(),
+            userId = UUID.randomUUID(),
+            placeId = UUID.randomUUID(),
+            attachedPhotoIds = listOf(UUID.randomUUID()),
+            content = "테스트",
+        )
+        val review = Review(
+            id = requestDto.reviewId,
+            userId = UUID.randomUUID(),
+            placeId = UUID.randomUUID(),
+        )
+        every {
+            reviewRepository.findByIdOrNull(requestDto.reviewId)
+        } returns review
+        val pointHistories = listOf(
+            PointHistory(
+                userId = requestDto.userId,
+                pointType = PointType.EXIST_CONTENT,
+            ),
+            PointHistory(
+                userId = requestDto.userId,
+                pointType = PointType.EXIST_PHOTO,
+            ),
+            PointHistory(
+                userId = requestDto.userId,
+                pointType = PointType.FIRST_REVIEW_AT_PLACE,
+            ),
+        )
+        every {
+            pointCalculateService.calculateModifyReviewPoint(review, requestDto)
+        } returns pointHistories
+
+        assertThrows<ReviewerNotEqualsException> {
+            reviewEventService.modify(requestDto)
+        }
+    }
+
+    @DisplayName("리뷰 수정 - 성공 / 0점에서 3점으로 변화한다고 가정")
+    @Test
+    fun review_modify_success() {
+
+        val requestDto = ReviewRequestDto(
+            reviewId = UUID.randomUUID(),
+            userId = UUID.randomUUID(),
+            placeId = UUID.randomUUID(),
+            attachedPhotoIds = listOf(UUID.randomUUID()),
+            content = "테스트",
+        )
+        val review = Review(
+            id = requestDto.reviewId,
+            userId = requestDto.userId,
+            placeId = UUID.randomUUID(),
+        )
+        every {
+            reviewRepository.findByIdOrNull(requestDto.reviewId)
+        } returns review
+        val pointHistories = listOf(
+            PointHistory(
+                userId = requestDto.userId,
+                pointType = PointType.EXIST_CONTENT,
+            ),
+            PointHistory(
+                userId = requestDto.userId,
+                pointType = PointType.EXIST_PHOTO,
+            ),
+            PointHistory(
+                userId = requestDto.userId,
+                pointType = PointType.FIRST_REVIEW_AT_PLACE,
+            ),
+        )
+        every {
+            pointCalculateService.calculateModifyReviewPoint(review, requestDto)
+        } returns pointHistories
+        every {
+            pointHistoryRepository.saveAll(pointHistories)
+        } returns pointHistories
+
+        reviewEventService.modify(requestDto)
+
+        verify {
+            reviewRepository.findByIdOrNull(requestDto.reviewId)
+            pointCalculateService.calculateModifyReviewPoint(review, requestDto)
+            pointHistoryRepository.saveAll(pointHistories)
+            userPointService.changeUserPoint(requestDto.userId, pointHistories.sumOf { it.pointType.point })
+        }
+        assertThat(review)
+            .usingRecursiveComparison()
+            .isEqualTo(requestDto.toReview())
     }
 }

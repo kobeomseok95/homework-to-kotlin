@@ -17,16 +17,18 @@ data class ReviewRequestDto(
     fun toReview() = Review(
         id = reviewId,
         content = content,
-        attachedPhotos =
-            if (attachedPhotoIds.isNotEmpty()) toAttachedPhotos()
-            else null,
+        attachedPhotos = toAttachedPhotos(),
         userId = userId,
         placeId = placeId,
     )
 
-    private fun toAttachedPhotos() = AttachedPhotos(
-        attachedPhotoIds.map {
-            AttachedPhoto(it)
-        }.toList(),
-    )
+    fun toAttachedPhotos() = if (attachedPhotoIds.isNotEmpty()) {
+        AttachedPhotos(
+            attachedPhotoIds.map {
+                AttachedPhoto(it)
+            }.toList()
+        )
+    } else {
+        null
+    }
 }

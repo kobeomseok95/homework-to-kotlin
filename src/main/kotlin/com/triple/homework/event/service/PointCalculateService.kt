@@ -2,6 +2,7 @@ package com.triple.homework.event.service
 
 import com.triple.homework.event.domain.PointHistory
 import com.triple.homework.event.domain.PointType
+import com.triple.homework.event.domain.Review
 import com.triple.homework.event.domain.ReviewRepository
 import com.triple.homework.event.service.dto.request.ReviewRequestDto
 import org.springframework.stereotype.Service
@@ -40,4 +41,9 @@ class PointCalculateService(
 
     private fun isFirstReview(requestDto: ReviewRequestDto) =
         !reviewRepository.existsByPlaceId(requestDto.placeId)
+
+    fun calculateModifyReviewPoint(review: Review, requestDto: ReviewRequestDto): List<PointHistory> {
+        TODO("Not yet implemented")
+        return listOf()
+    }
 }

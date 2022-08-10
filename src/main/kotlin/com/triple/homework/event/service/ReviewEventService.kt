@@ -1,9 +1,11 @@
 package com.triple.homework.event.service
 
+import com.triple.homework.common.exception.review.ReviewNotFoundException
 import com.triple.homework.common.exception.review.UserWrittenReviewException
 import com.triple.homework.event.domain.PointHistoryRepository
 import com.triple.homework.event.domain.ReviewRepository
 import com.triple.homework.event.service.dto.request.ReviewRequestDto
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -34,5 +36,22 @@ class ReviewEventService(
         if (reviewRepository.existsById(requestDto.reviewId)) {
             throw UserWrittenReviewException()
         }
+    }
+
+    fun modify(requestDto: ReviewRequestDto) {
+        val review = (reviewRepository.findByIdOrNull(requestDto.reviewId)
+            ?: throw ReviewNotFoundException())
+        val reviewPoints = pointCalculateService.calculateModifyReviewPoint(review, requestDto)
+        review.update(
+            requestDto.userId,
+            requestDto.placeId,
+            requestDto.content,
+            requestDto.toAttachedPhotos(),
+        )
+        pointHistoryRepository.saveAll(reviewPoints)
+        userPointService.changeUserPoint(
+            requestDto.userId,
+            reviewPoints.sumOf { it.pointType.point }
+        )
     }
 }
