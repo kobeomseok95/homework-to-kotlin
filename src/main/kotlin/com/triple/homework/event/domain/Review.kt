@@ -8,7 +8,7 @@ import javax.persistence.Entity
 import javax.persistence.Id
 
 @Entity
-data class Review(
+class Review(
 
    @Id
    @Column(name = "REVIEW_ID")

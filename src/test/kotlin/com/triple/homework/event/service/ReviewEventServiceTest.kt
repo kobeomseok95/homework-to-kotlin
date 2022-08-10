@@ -2,6 +2,7 @@ package com.triple.homework.event.service
 
 import com.triple.homework.common.exception.review.UserWrittenReviewException
 import com.triple.homework.event.domain.PointHistory
+import com.triple.homework.event.domain.PointHistoryRepository
 import com.triple.homework.event.domain.PointType
 import com.triple.homework.event.domain.ReviewRepository
 import com.triple.homework.event.service.dto.request.ReviewRequestDto
@@ -15,11 +16,15 @@ import java.util.*
 
 internal class ReviewEventServiceTest {
 
-    private val reviewRepository: ReviewRepository = mockk(relaxed = true, relaxUnitFun = true)
+    private val reviewRepository: ReviewRepository = mockk()
     private val pointCalculateService: PointCalculateService = mockk()
+    private val pointHistoryRepository: PointHistoryRepository = mockk()
+    private val userPointService: UserPointService = mockk(relaxed = true)
     private val reviewEventService: ReviewEventService = ReviewEventService(
         reviewRepository,
         pointCalculateService,
+        pointHistoryRepository,
+        userPointService,
     )
 
     @DisplayName("리뷰 작성 - 실패 / 유저가 이미 작성한 리뷰인 경우 추가할 수 없다.")
@@ -72,7 +77,6 @@ internal class ReviewEventServiceTest {
         }
     }
 
-    // TODO: ClassCastException 발생 테스트 코드
     @DisplayName("리뷰 생성 - 성공 / 첫 리뷰, 내용이 있음, 사진이 있다고 가정")
     @Test
     fun review_add_success() {
@@ -84,6 +88,16 @@ internal class ReviewEventServiceTest {
             attachedPhotoIds = listOf(UUID.randomUUID()),
             content = "테스트",
         )
+        every {
+            reviewRepository.existsByUserIdAndPlaceId(requestDto.userId, requestDto.placeId)
+        } returns false
+        every {
+            reviewRepository.existsById(requestDto.reviewId)
+        } returns false
+        val review = requestDto.toReview()
+        every {
+            reviewRepository.save(any())
+        } returns review
         val pointHistories = listOf(
             PointHistory(
                 userId = requestDto.userId,
@@ -99,17 +113,11 @@ internal class ReviewEventServiceTest {
             ),
         )
         every {
-            reviewRepository.existsByUserIdAndPlaceId(requestDto.userId, requestDto.placeId)
-        } returns false
-        every {
-            reviewRepository.existsById(requestDto.reviewId)
-        } returns false
-        every {
             pointCalculateService.calculateAddReviewPoint(requestDto)
         } returns pointHistories
         every {
-            reviewRepository.save(requestDto.toReview())
-        } returns requestDto.toReview()
+            pointHistoryRepository.saveAll(pointHistories)
+        } returns pointHistories
 
         reviewEventService.add(requestDto)
 
@@ -117,6 +125,13 @@ internal class ReviewEventServiceTest {
             reviewRepository.existsByUserIdAndPlaceId(requestDto.userId, requestDto.placeId)
             reviewRepository.existsById(requestDto.reviewId)
             pointCalculateService.calculateAddReviewPoint(requestDto)
+            reviewRepository.save(any())
+            userPointService.saveUserIfNotFoundAndCalculateUserPoint(
+                requestDto.userId,
+                pointHistories.sumOf {
+                    it.pointType.point
+                }
+            )
         }
     }
 }

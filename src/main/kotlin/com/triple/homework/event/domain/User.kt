@@ -17,4 +17,9 @@ class User(
 
     var point: Long,
 
-): BaseTimeEntity()
+): BaseTimeEntity() {
+
+    fun changePoint(point: Int) {
+        this.point += point
+    }
+}
