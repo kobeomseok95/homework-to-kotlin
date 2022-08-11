@@ -17,7 +17,7 @@ import java.util.*
 
 internal class ReviewEventServiceTest {
 
-    private val reviewRepository: ReviewRepository = mockk()
+    private val reviewRepository: ReviewRepository = mockk(relaxed = true)
     private val pointCalculateService: PointCalculateService = mockk()
     private val pointHistoryRepository: PointHistoryRepository = mockk()
     private val userPointService: UserPointService = mockk(relaxed = true)
@@ -318,6 +318,7 @@ internal class ReviewEventServiceTest {
             pointCalculateService.calculateDeleteReviewPoint(review)
             pointHistoryRepository.saveAll(pointHistories)
             userPointService.changeUserPoint(requestDto.userId, pointHistories.sumOf { it.pointType.point })
+            reviewRepository.delete(review)
         }
     }
 }

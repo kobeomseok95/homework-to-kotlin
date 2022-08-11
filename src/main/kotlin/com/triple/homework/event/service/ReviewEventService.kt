@@ -46,6 +46,7 @@ class ReviewEventService(
     }
 
     fun modify(requestDto: ReviewRequestDto) {
+        // TODO: fetch join 구현하기
         val review = reviewRepository.findByIdOrNull(requestDto.reviewId)
             ?: throw ReviewNotFoundException()
         val pointHistories = pointCalculateService.calculateModifyReviewPoint(review, requestDto)
@@ -72,5 +73,6 @@ class ReviewEventService(
             requestDto.userId,
             pointHistories.sumOf { it.pointType.point }
         )
+        reviewRepository.delete(review)
     }
 }
