@@ -1,5 +1,6 @@
 package com.triple.homework.event.service
 
+import com.triple.homework.common.exception.user.UserNotFoundException
 import com.triple.homework.event.domain.User
 import com.triple.homework.event.domain.UserRepository
 import io.mockk.every
@@ -8,6 +9,7 @@ import io.mockk.verify
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.data.repository.findByIdOrNull
 import java.util.*
 
@@ -62,6 +64,45 @@ internal class UserPointServiceTest {
             .isEqualTo(beforeUserPoint + savePoint)
         verify {
             userRepository.findById(userId)
+        }
+    }
+
+    @DisplayName("유저의 포인트 변경 - 실패 / 유저가 존재하지 않을 경우")
+    @Test
+    fun change_user_point_fail_not_found_user() {
+
+        val userId = UUID.randomUUID()
+        every {
+            userRepository.findByIdOrNull(userId)
+        } returns null
+
+        assertThrows<UserNotFoundException> {
+            userPointService.changeUserPoint(userId, 1)
+        }
+        verify {
+            userRepository.findByIdOrNull(userId)
+        }
+    }
+
+    @DisplayName("유저의 포인트 변경 - 성공")
+    @Test
+    fun change_user_point_success() {
+
+        val user = User(
+            id = UUID.randomUUID(),
+            point = 10L,
+        )
+        val receivedPoint = 3
+        val beforeChangeUserPoint = user.point
+        every {
+            userRepository.findByIdOrNull(user.id)
+        } returns user
+
+        userPointService.changeUserPoint(user.id, receivedPoint)
+
+        assertThat(user.point).isEqualTo(beforeChangeUserPoint + receivedPoint)
+        verify {
+            userRepository.findByIdOrNull(user.id)
         }
     }
 }
