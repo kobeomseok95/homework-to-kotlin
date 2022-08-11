@@ -15,7 +15,7 @@ internal class ReviewTest {
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
             isFirstReview = false,
-            attachedPhotos = AttachedPhotos(listOf(
+            attachedPhotos = AttachedPhotos(mutableSetOf(
                 AttachedPhoto(UUID.randomUUID()),
                 AttachedPhoto(UUID.randomUUID()),
             ))
@@ -33,7 +33,7 @@ internal class ReviewTest {
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
             isFirstReview = false,
-            attachedPhotos = AttachedPhotos(listOf())
+            attachedPhotos = AttachedPhotos(mutableSetOf())
         )
 
         assertThat(review.havePhotos)

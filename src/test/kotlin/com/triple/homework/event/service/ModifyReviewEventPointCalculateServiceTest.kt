@@ -112,7 +112,7 @@ internal class ModifyReviewEventPointCalculateServiceTest {
             id = UUID.randomUUID(),
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
-            attachedPhotos = AttachedPhotos(listOf(
+            attachedPhotos = AttachedPhotos(mutableSetOf(
                 AttachedPhoto(UUID.randomUUID())
             )),
             isFirstReview = true,
@@ -249,7 +249,7 @@ internal class ModifyReviewEventPointCalculateServiceTest {
             id = UUID.randomUUID(),
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
-            attachedPhotos = AttachedPhotos(listOf(
+            attachedPhotos = AttachedPhotos(mutableSetOf(
                 AttachedPhoto(UUID.randomUUID())
             )),
             content = "테스트 컨텐츠",

@@ -21,7 +21,7 @@ internal class DeleteReviewEventPointCalculateServiceTest {
             id = UUID.randomUUID(),
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
-            attachedPhotos = AttachedPhotos(listOf(
+            attachedPhotos = AttachedPhotos(mutableSetOf(
                 AttachedPhoto(UUID.randomUUID())
             )),
             content = "테스트 컨텐츠",
@@ -103,7 +103,7 @@ internal class DeleteReviewEventPointCalculateServiceTest {
             id = UUID.randomUUID(),
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
-            attachedPhotos = AttachedPhotos(listOf(
+            attachedPhotos = AttachedPhotos(mutableSetOf(
                 AttachedPhoto(UUID.randomUUID())
             )),
             isFirstReview = false,

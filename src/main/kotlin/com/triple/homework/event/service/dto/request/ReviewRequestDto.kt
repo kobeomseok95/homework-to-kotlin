@@ -32,13 +32,9 @@ data class ReviewRequestDto(
         isFirstReview = isFirstReview,
     )
 
-    fun toAttachedPhotos() = if (attachedPhotoIds.isNotEmpty()) {
-        AttachedPhotos(
-            attachedPhotoIds.map {
-                AttachedPhoto(it)
-            }.toList()
-        )
-    } else {
-        null
-    }
+    fun toAttachedPhotos() = if (havePhotos) {
+        AttachedPhotos(attachedPhotoIds.map {
+            AttachedPhoto(it)
+        }.toMutableSet())
+    } else null
 }

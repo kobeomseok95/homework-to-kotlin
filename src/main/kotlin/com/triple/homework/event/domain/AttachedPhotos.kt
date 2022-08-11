@@ -10,10 +10,16 @@ class AttachedPhotos(
         name = "ATTACHED_PHOTO",
         joinColumns = [ JoinColumn(name = "REVIEW_ID") ],
     )
-    val attachedPhotos: List<AttachedPhoto>
+    @OrderColumn(name = "ATTACHED_PHOTO_INDEX")
+    val attachedPhotos: MutableSet<AttachedPhoto> = mutableSetOf()
 
 ) {
 
     val havePhotos: Boolean
         get() = attachedPhotos.isNotEmpty()
+
+    fun update(target: MutableSet<AttachedPhoto>) {
+        attachedPhotos.clear()
+        attachedPhotos.addAll(target)
+    }
 }
