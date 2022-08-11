@@ -12,4 +12,8 @@ class AttachedPhotos(
     )
     val attachedPhotos: List<AttachedPhoto>
 
-)
+) {
+
+    val havePhotos: Boolean
+        get() = attachedPhotos.isNotEmpty()
+}

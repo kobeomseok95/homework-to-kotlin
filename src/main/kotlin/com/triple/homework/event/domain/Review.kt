@@ -31,9 +31,8 @@ class Review(
 
 ): BaseTimeEntity() {
 
-    // TODO: test
     val havePhotos: Boolean
-        get() = attachedPhotos != null && attachedPhotos!!.attachedPhotos.isNotEmpty()
+        get() = attachedPhotos?.havePhotos ?: false
 
     val hasContent: Boolean
         get() = !content.isNullOrBlank()
