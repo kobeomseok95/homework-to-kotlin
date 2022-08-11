@@ -20,7 +20,9 @@ class User(
 ): BaseTimeEntity() {
 
     fun changePoint(point: Int) {
-        // TODO: test 음수일 경우는 어떻게하지?
         this.point += point
+        if (this.point < 0) {
+            this.point = 0
+        }
     }
 }
