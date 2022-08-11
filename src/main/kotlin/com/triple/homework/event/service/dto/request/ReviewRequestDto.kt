@@ -14,6 +14,15 @@ data class ReviewRequestDto(
     val placeId: UUID,
 ) {
 
+    val hasContent: Boolean
+        get() = !content.isNullOrBlank()
+
+    val havePhotos: Boolean
+        get() = attachedPhotoIds.isNotEmpty()
+
+    val photosSize: Int
+        get() = if (!havePhotos) 0 else attachedPhotoIds.size
+
     fun toReview(isFirstReview: Boolean) = Review(
         id = reviewId,
         content = content,

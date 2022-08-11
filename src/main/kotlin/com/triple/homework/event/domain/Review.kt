@@ -31,6 +31,13 @@ class Review(
 
 ): BaseTimeEntity() {
 
+    // TODO: test
+    val havePhotos: Boolean
+        get() = attachedPhotos != null && attachedPhotos!!.attachedPhotos.isNotEmpty()
+
+    val hasContent: Boolean
+        get() = !content.isNullOrBlank()
+
     fun update(userId: UUID,
                placeId: UUID,
                content: String?,
@@ -46,16 +53,4 @@ class Review(
         if (this.userId != userId)
             throw ReviewerNotEqualsException()
     }
-
-    // TODO: test
-    val havePhotos: Boolean
-        get() = attachedPhotos != null
-
-    // TODO: test
-    val photosSize: Int
-        get() = if (!havePhotos) {
-            0
-        } else {
-            attachedPhotos!!.attachedPhotos.size
-        }
 }

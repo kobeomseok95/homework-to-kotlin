@@ -6,7 +6,6 @@ import com.triple.homework.event.domain.Review
 import com.triple.homework.event.domain.ReviewRepository
 import com.triple.homework.event.service.dto.request.ReviewRequestDto
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class PointCalculateService(
@@ -15,10 +14,10 @@ class PointCalculateService(
 
     fun calculateAddReviewPoint(requestDto: ReviewRequestDto): List<PointHistory> {
         val pointTypes = mutableListOf<PointType>()
-        if (hasContent(requestDto.content)) {
+        if (requestDto.hasContent) {
             pointTypes.add(PointType.EXIST_CONTENT)
         }
-        if (havePhotos(requestDto.attachedPhotoIds)) {
+        if (requestDto.havePhotos) {
             pointTypes.add(PointType.EXIST_PHOTO)
         }
         if (isFirstReview(requestDto)) {
@@ -32,12 +31,6 @@ class PointCalculateService(
             )
         }
     }
-
-    private fun hasContent(content: String?) =
-        !content.isNullOrBlank()
-
-    private fun havePhotos(attachedPhotoIds: List<UUID>) =
-        attachedPhotoIds.isNotEmpty()
 
     private fun isFirstReview(requestDto: ReviewRequestDto) =
         !reviewRepository.existsByPlaceId(requestDto.placeId)
@@ -61,14 +54,12 @@ class PointCalculateService(
                                     review: Review,
                                     requestDto: ReviewRequestDto,
     ) {
-        if (review.content == requestDto.content) {
-            return
-        }
-
-        if (review.content.isNullOrBlank() && !requestDto.content.isNullOrBlank()) {
+        if (!review.hasContent && requestDto.hasContent) {
             pointTypes.add(PointType.EXIST_CONTENT)
-        } else if (!review.content.isNullOrBlank() && requestDto.content.isNullOrBlank()) {
+            return
+        } else if (review.hasContent && !requestDto.hasContent) {
             pointTypes.add(PointType.REMOVE_CONTENT)
+            return
         }
     }
 
@@ -76,14 +67,12 @@ class PointCalculateService(
                                            review: Review,
                                            requestDto: ReviewRequestDto,
     ) {
-        if (review.photosSize == requestDto.attachedPhotoIds.size) {
-            return
-        }
-
-        if (!review.havePhotos && requestDto.attachedPhotoIds.isNotEmpty()) {
+        if (!review.havePhotos && requestDto.havePhotos) {
             pointTypes.add(PointType.EXIST_PHOTO)
-        } else if (review.havePhotos && requestDto.attachedPhotoIds.isEmpty()) {
+            return
+        } else if (review.havePhotos && !requestDto.havePhotos) {
             pointTypes.add(PointType.REMOVE_PHOTO)
+            return
         }
     }
 
@@ -105,7 +94,21 @@ class PointCalculateService(
     }
 
     fun calculateDeleteReviewPoint(review: Review): List<PointHistory> {
-        // TODO: test
-        return listOf()
+        val pointTypes = mutableListOf<PointType>()
+        if (review.isFirstReview) {
+            pointTypes.add(PointType.REMOVE_FIRST_REVIEW_AT_PLACE)
+        }
+        if (review.havePhotos) {
+            pointTypes.add(PointType.REMOVE_PHOTO)
+        }
+        if (review.hasContent) {
+            pointTypes.add(PointType.REMOVE_CONTENT)
+        }
+        return pointTypes.map {
+            PointHistory(
+                userId = review.userId,
+                pointType = it
+            )
+        }
     }
 }
