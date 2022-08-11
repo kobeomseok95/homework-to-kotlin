@@ -17,4 +17,4 @@ class PointHistory(
     @Enumerated(EnumType.STRING)
     val pointType: PointType,
 
-    ): BaseTimeEntity()
+): BaseTimeEntity()

@@ -43,19 +43,30 @@ class ReviewEventService(
     }
 
     fun modify(requestDto: ReviewRequestDto) {
-        val review = (reviewRepository.findByIdOrNull(requestDto.reviewId)
-            ?: throw ReviewNotFoundException())
-        val reviewPoints = pointCalculateService.calculateModifyReviewPoint(review, requestDto)
+        val review = reviewRepository.findByIdOrNull(requestDto.reviewId)
+            ?: throw ReviewNotFoundException()
+        val pointHistories = pointCalculateService.calculateModifyReviewPoint(review, requestDto)
         review.update(
             requestDto.userId,
             requestDto.placeId,
             requestDto.content,
             requestDto.toAttachedPhotos(),
         )
-        pointHistoryRepository.saveAll(reviewPoints)
+        pointHistoryRepository.saveAll(pointHistories)
         userPointService.changeUserPoint(
             requestDto.userId,
-            reviewPoints.sumOf { it.pointType.point }
+            pointHistories.sumOf { it.pointType.point }
+        )
+    }
+
+    fun delete(requestDto: ReviewRequestDto) {
+        val review = reviewRepository.findByIdOrNull(requestDto.reviewId)
+            ?: throw ReviewNotFoundException()
+        val pointHistories = pointCalculateService.calculateDeleteReviewPoint(review)
+        pointHistoryRepository.saveAll(pointHistories)
+        userPointService.changeUserPoint(
+            requestDto.userId,
+            pointHistories.sumOf { it.pointType.point }
         )
     }
 }

@@ -103,4 +103,9 @@ class PointCalculateService(
             return
         }
     }
+
+    fun calculateDeleteReviewPoint(review: Review): List<PointHistory> {
+        // TODO: test
+        return listOf()
+    }
 }

@@ -252,4 +252,77 @@ internal class ReviewEventServiceTest {
             .usingRecursiveComparison()
             .isEqualTo(requestDto.toReview(false))
     }
+
+    @DisplayName("리뷰 삭제 - 실패 / 리뷰가 없을 경우")
+    @Test
+    fun delete_review_fail_not_found_review() {
+
+        val requestDto = ReviewRequestDto(
+            reviewId = UUID.randomUUID(),
+            userId = UUID.randomUUID(),
+            placeId = UUID.randomUUID(),
+            attachedPhotoIds = listOf(UUID.randomUUID()),
+            content = "테스트",
+        )
+        every {
+            reviewRepository.findByIdOrNull(requestDto.reviewId)
+        } returns null
+
+        assertThrows<ReviewNotFoundException> {
+            reviewEventService.delete(requestDto)
+        }
+    }
+
+    @DisplayName("리뷰 삭제 - 성공 / 첫 리뷰, 내용 작성, 첨부파일이 존재한다고 가정")
+    @Test
+    fun delete_review_success() {
+
+        val requestDto = ReviewRequestDto(
+            reviewId = UUID.randomUUID(),
+            userId = UUID.randomUUID(),
+            placeId = UUID.randomUUID(),
+            attachedPhotoIds = listOf(UUID.randomUUID()),
+            content = "테스트",
+        )
+        val review = Review(
+            id = requestDto.reviewId,
+            userId = requestDto.userId,
+            placeId = requestDto.placeId,
+            content = requestDto.content,
+            attachedPhotos = requestDto.toAttachedPhotos(),
+            isFirstReview = true,
+        )
+        every {
+            reviewRepository.findByIdOrNull(requestDto.reviewId)
+        } returns review
+        val pointHistories = listOf(
+            PointHistory(
+                userId = requestDto.userId,
+                pointType = PointType.REMOVE_FIRST_REVIEW_AT_PLACE
+            ),
+            PointHistory(
+                userId = requestDto.userId,
+                pointType = PointType.REMOVE_PHOTO
+            ),
+            PointHistory(
+                userId = requestDto.userId,
+                pointType = PointType.REMOVE_CONTENT
+            ),
+        )
+        every {
+            pointCalculateService.calculateDeleteReviewPoint(review)
+        } returns pointHistories
+        every {
+            pointHistoryRepository.saveAll(pointHistories)
+        } returns pointHistories
+
+        reviewEventService.delete(requestDto)
+
+        verify {
+            reviewRepository.findByIdOrNull(requestDto.reviewId)
+            pointCalculateService.calculateDeleteReviewPoint(review)
+            pointHistoryRepository.saveAll(pointHistories)
+            userPointService.changeUserPoint(requestDto.userId, pointHistories.sumOf { it.pointType.point })
+        }
+    }
 }
