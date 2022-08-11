@@ -57,6 +57,7 @@ internal class DeleteReviewEventPointCalculateServiceTest {
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
             isFirstReview = true,
+            attachedPhotos = AttachedPhotos(),
         )
 
         val reviewPoints = pointCalculateService.calculateDeleteReviewPoint(review)
@@ -81,6 +82,7 @@ internal class DeleteReviewEventPointCalculateServiceTest {
             placeId = UUID.randomUUID(),
             content = "테스트 컨텐츠",
             isFirstReview = false,
+            attachedPhotos = AttachedPhotos(),
         )
 
         val reviewPoints = pointCalculateService.calculateDeleteReviewPoint(review)

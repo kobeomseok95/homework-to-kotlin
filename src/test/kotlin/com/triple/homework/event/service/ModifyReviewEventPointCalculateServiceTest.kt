@@ -25,6 +25,7 @@ internal class ModifyReviewEventPointCalculateServiceTest {
             placeId = UUID.randomUUID(),
             content = "테스트 컨텐츠",
             isFirstReview = true,
+            attachedPhotos = AttachedPhotos(),
         )
         val requestDto = ReviewRequestDto(
             reviewId = review.id,
@@ -54,6 +55,7 @@ internal class ModifyReviewEventPointCalculateServiceTest {
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
             isFirstReview = true,
+            attachedPhotos = AttachedPhotos(),
         )
         val requestDto = ReviewRequestDto(
             reviewId = review.id,
@@ -84,6 +86,7 @@ internal class ModifyReviewEventPointCalculateServiceTest {
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
             isFirstReview = true,
+            attachedPhotos = AttachedPhotos(),
         )
         val requestDto = ReviewRequestDto(
             reviewId = review.id,
@@ -145,6 +148,7 @@ internal class ModifyReviewEventPointCalculateServiceTest {
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
             isFirstReview = true,
+            attachedPhotos = AttachedPhotos(),
         )
         val requestDto = ReviewRequestDto(
             reviewId = review.id,
@@ -177,6 +181,7 @@ internal class ModifyReviewEventPointCalculateServiceTest {
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
             isFirstReview = false,
+            attachedPhotos = AttachedPhotos(),
         )
         val requestDto = ReviewRequestDto(
             reviewId = review.id,
@@ -209,6 +214,7 @@ internal class ModifyReviewEventPointCalculateServiceTest {
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
             isFirstReview = false,
+            attachedPhotos = AttachedPhotos(),
         )
         val requestDto = ReviewRequestDto(
             reviewId = review.id,

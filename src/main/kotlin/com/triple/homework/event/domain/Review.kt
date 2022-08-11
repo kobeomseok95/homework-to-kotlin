@@ -24,7 +24,7 @@ class Review(
    var content: String? = null,
 
    @Embedded
-   var attachedPhotos: AttachedPhotos? = null,
+   val attachedPhotos: AttachedPhotos,
 
    @Column(nullable = false)
    var isFirstReview: Boolean,
@@ -32,7 +32,7 @@ class Review(
 ): BaseTimeEntity() {
 
     val havePhotos: Boolean
-        get() = attachedPhotos?.havePhotos ?: false
+        get() = attachedPhotos.havePhotos
 
     val hasContent: Boolean
         get() = !content.isNullOrBlank()
@@ -40,12 +40,14 @@ class Review(
     fun update(userId: UUID,
                placeId: UUID,
                content: String?,
-               attachedPhotos: AttachedPhotos?
+               attachedPhotos: MutableSet<AttachedPhoto>,
+               isFirstReview: Boolean,
     ) {
         checkEquals(userId)
         this.placeId = placeId
         this.content = content
-        this.attachedPhotos = attachedPhotos
+        this.attachedPhotos.update(attachedPhotos)
+        this.isFirstReview = isFirstReview
     }
 
     private fun checkEquals(userId: UUID) {

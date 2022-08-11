@@ -2,6 +2,7 @@ package com.triple.homework.event.service
 
 import com.triple.homework.common.exception.review.ReviewNotFoundException
 import com.triple.homework.common.exception.review.UserWrittenReviewException
+import com.triple.homework.event.domain.PointHistory
 import com.triple.homework.event.domain.PointHistoryRepository
 import com.triple.homework.event.domain.PointType
 import com.triple.homework.event.domain.ReviewRepository
@@ -22,16 +23,18 @@ class ReviewEventService(
     fun add(requestDto: ReviewRequestDto) {
         validateExistReview(requestDto)
         val pointHistories = pointCalculateService.calculateAddReviewPoint(requestDto)
-        val isFirstReview = pointHistories.find {
-            it.pointType == PointType.FIRST_REVIEW_AT_PLACE
-        } != null
-        reviewRepository.save(requestDto.toReview(isFirstReview))
+        reviewRepository.save(requestDto.toReview(containsFirstReview(pointHistories)))
         pointHistoryRepository.saveAll(pointHistories)
         userPointService.saveUserIfNotFoundAndCalculateUserPoint(
             requestDto.userId,
             pointHistories.sumOf { it.pointType.point },
         )
     }
+
+    private fun containsFirstReview(pointHistories: List<PointHistory>) =
+        pointHistories.firstOrNull {
+            it.pointType == PointType.FIRST_REVIEW_AT_PLACE
+        } != null
 
     private fun validateExistReview(requestDto: ReviewRequestDto) {
         if (reviewRepository.existsByUserIdAndPlaceId(requestDto.userId, requestDto.placeId)) {
@@ -50,7 +53,8 @@ class ReviewEventService(
             requestDto.userId,
             requestDto.placeId,
             requestDto.content,
-            requestDto.toAttachedPhotos(),
+            requestDto.toAttachedPhotoSet(),
+            containsFirstReview(pointHistories)
         )
         pointHistoryRepository.saveAll(pointHistories)
         userPointService.changeUserPoint(

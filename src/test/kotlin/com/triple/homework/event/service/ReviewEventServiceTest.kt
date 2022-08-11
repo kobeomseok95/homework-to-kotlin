@@ -172,6 +172,7 @@ internal class ReviewEventServiceTest {
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
             isFirstReview = false,
+            attachedPhotos = AttachedPhotos(),
         )
         every {
             reviewRepository.findByIdOrNull(requestDto.reviewId)
@@ -215,6 +216,7 @@ internal class ReviewEventServiceTest {
             userId = requestDto.userId,
             placeId = UUID.randomUUID(),
             isFirstReview = false,
+            attachedPhotos = AttachedPhotos(),
         )
         every {
             reviewRepository.findByIdOrNull(requestDto.reviewId)
@@ -250,7 +252,7 @@ internal class ReviewEventServiceTest {
         }
         assertThat(review)
             .usingRecursiveComparison()
-            .isEqualTo(requestDto.toReview(false))
+            .isEqualTo(requestDto.toReview(true))
     }
 
     @DisplayName("리뷰 삭제 - 실패 / 리뷰가 없을 경우")
@@ -284,14 +286,7 @@ internal class ReviewEventServiceTest {
             attachedPhotoIds = listOf(UUID.randomUUID()),
             content = "테스트",
         )
-        val review = Review(
-            id = requestDto.reviewId,
-            userId = requestDto.userId,
-            placeId = requestDto.placeId,
-            content = requestDto.content,
-            attachedPhotos = requestDto.toAttachedPhotos(),
-            isFirstReview = true,
-        )
+        val review = requestDto.toReview(true)
         every {
             reviewRepository.findByIdOrNull(requestDto.reviewId)
         } returns review

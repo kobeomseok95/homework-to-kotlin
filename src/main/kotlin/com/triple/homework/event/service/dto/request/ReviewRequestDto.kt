@@ -20,9 +20,6 @@ data class ReviewRequestDto(
     val havePhotos: Boolean
         get() = attachedPhotoIds.isNotEmpty()
 
-    val photosSize: Int
-        get() = if (!havePhotos) 0 else attachedPhotoIds.size
-
     fun toReview(isFirstReview: Boolean) = Review(
         id = reviewId,
         content = content,
@@ -32,9 +29,15 @@ data class ReviewRequestDto(
         isFirstReview = isFirstReview,
     )
 
-    fun toAttachedPhotos() = if (havePhotos) {
+    private fun toAttachedPhotos() = if (havePhotos)
         AttachedPhotos(attachedPhotoIds.map {
             AttachedPhoto(it)
         }.toMutableSet())
-    } else null
+    else AttachedPhotos()
+
+    fun toAttachedPhotoSet() = if (havePhotos)
+        attachedPhotoIds.map {
+            AttachedPhoto(it)
+        }.toMutableSet()
+    else mutableSetOf()
 }
