@@ -105,4 +105,44 @@ internal class UserPointServiceTest {
             userRepository.findByIdOrNull(user.id)
         }
     }
+
+    @DisplayName("유저가 현재 보유한 포인트 내역 조회 - 실패 / 존재하지 않는 유저인 경우")
+    @Test
+    fun get_user_point_fail_not_found_user() {
+
+        val user = User(
+            id = UUID.randomUUID(),
+            point = 3L,
+        )
+        every {
+            userRepository.findByIdOrNull(user.id)
+        } returns null
+
+        assertThrows<UserNotFoundException> {
+            userPointService.getUserPoint(user.id)
+        }
+        verify {
+            userRepository.findByIdOrNull(user.id)
+        }
+    }
+
+    @DisplayName("유저가 현재 보유한 포인트 내역 조회 - 성공")
+    @Test
+    fun get_user_point_success() {
+
+        val user = User(
+            id = UUID.randomUUID(),
+            point = 3L,
+        )
+        every {
+            userRepository.findByIdOrNull(user.id)
+        } returns user
+
+        val userPointResponseDto = userPointService.getUserPoint(user.id)
+
+        assertThat(userPointResponseDto.point)
+            .isEqualTo(user.point)
+        assertThat(userPointResponseDto.userId)
+            .isEqualTo(user.id)
+    }
 }
