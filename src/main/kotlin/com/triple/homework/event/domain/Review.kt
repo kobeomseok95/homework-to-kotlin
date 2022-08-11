@@ -26,6 +26,9 @@ class Review(
    @Embedded
    var attachedPhotos: AttachedPhotos? = null,
 
+   @Column(nullable = false)
+   var isFirstReview: Boolean,
+
 ): BaseTimeEntity() {
 
     fun update(userId: UUID,
@@ -43,4 +46,16 @@ class Review(
         if (this.userId != userId)
             throw ReviewerNotEqualsException()
     }
+
+    // TODO: test
+    val havePhotos: Boolean
+        get() = attachedPhotos != null
+
+    // TODO: test
+    val photosSize: Int
+        get() = if (!havePhotos) {
+            0
+        } else {
+            attachedPhotos!!.attachedPhotos.size
+        }
 }

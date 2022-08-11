@@ -95,10 +95,6 @@ internal class ReviewEventServiceTest {
         every {
             reviewRepository.existsById(requestDto.reviewId)
         } returns false
-        val review = requestDto.toReview()
-        every {
-            reviewRepository.save(any())
-        } returns review
         val pointHistories = listOf(
             PointHistory(
                 userId = requestDto.userId,
@@ -116,6 +112,10 @@ internal class ReviewEventServiceTest {
         every {
             pointCalculateService.calculateAddReviewPoint(requestDto)
         } returns pointHistories
+        val review = requestDto.toReview(true)
+        every {
+            reviewRepository.save(any())
+        } returns review
         every {
             pointHistoryRepository.saveAll(pointHistories)
         } returns pointHistories
@@ -171,6 +171,7 @@ internal class ReviewEventServiceTest {
             id = requestDto.reviewId,
             userId = UUID.randomUUID(),
             placeId = UUID.randomUUID(),
+            isFirstReview = false,
         )
         every {
             reviewRepository.findByIdOrNull(requestDto.reviewId)
@@ -213,6 +214,7 @@ internal class ReviewEventServiceTest {
             id = requestDto.reviewId,
             userId = requestDto.userId,
             placeId = UUID.randomUUID(),
+            isFirstReview = false,
         )
         every {
             reviewRepository.findByIdOrNull(requestDto.reviewId)
@@ -248,6 +250,6 @@ internal class ReviewEventServiceTest {
         }
         assertThat(review)
             .usingRecursiveComparison()
-            .isEqualTo(requestDto.toReview())
+            .isEqualTo(requestDto.toReview(false))
     }
 }

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.util.*
 
-internal class PointCalculateServiceTest {
+internal class AddReviewEventPointCalculateServiceTest {
 
     private val reviewRepository: ReviewRepository = mockk()
     private val pointCalculateService: PointCalculateService = PointCalculateService(

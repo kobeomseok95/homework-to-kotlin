@@ -3,6 +3,7 @@ package com.triple.homework.event.service
 import com.triple.homework.common.exception.review.ReviewNotFoundException
 import com.triple.homework.common.exception.review.UserWrittenReviewException
 import com.triple.homework.event.domain.PointHistoryRepository
+import com.triple.homework.event.domain.PointType
 import com.triple.homework.event.domain.ReviewRepository
 import com.triple.homework.event.service.dto.request.ReviewRequestDto
 import org.springframework.data.repository.findByIdOrNull
@@ -20,12 +21,15 @@ class ReviewEventService(
 
     fun add(requestDto: ReviewRequestDto) {
         validateExistReview(requestDto)
-        val reviewPoints = pointCalculateService.calculateAddReviewPoint(requestDto)
-        reviewRepository.save(requestDto.toReview())
-        pointHistoryRepository.saveAll(reviewPoints)
+        val pointHistories = pointCalculateService.calculateAddReviewPoint(requestDto)
+        val isFirstReview = pointHistories.find {
+            it.pointType == PointType.FIRST_REVIEW_AT_PLACE
+        } != null
+        reviewRepository.save(requestDto.toReview(isFirstReview))
+        pointHistoryRepository.saveAll(pointHistories)
         userPointService.saveUserIfNotFoundAndCalculateUserPoint(
             requestDto.userId,
-            reviewPoints.sumOf { it.pointType.point },
+            pointHistories.sumOf { it.pointType.point },
         )
     }
 

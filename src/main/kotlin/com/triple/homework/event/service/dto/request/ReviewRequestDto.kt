@@ -14,12 +14,13 @@ data class ReviewRequestDto(
     val placeId: UUID,
 ) {
 
-    fun toReview() = Review(
+    fun toReview(isFirstReview: Boolean) = Review(
         id = reviewId,
         content = content,
         attachedPhotos = toAttachedPhotos(),
         userId = userId,
         placeId = placeId,
+        isFirstReview = isFirstReview,
     )
 
     fun toAttachedPhotos() = if (attachedPhotoIds.isNotEmpty()) {
