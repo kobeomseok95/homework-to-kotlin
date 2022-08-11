@@ -46,8 +46,7 @@ class ReviewEventService(
     }
 
     fun modify(requestDto: ReviewRequestDto) {
-        // TODO: fetch join 구현하기
-        val review = reviewRepository.findByIdOrNull(requestDto.reviewId)
+        val review = reviewRepository.findWithAttachedPhotosById(requestDto.reviewId)
             ?: throw ReviewNotFoundException()
         val pointHistories = pointCalculateService.calculateModifyReviewPoint(review, requestDto)
         review.update(

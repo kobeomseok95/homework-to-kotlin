@@ -14,8 +14,8 @@ interface ReviewRepository: JpaRepository<Review, UUID> {
     @Query("""
         select r 
         from Review r
-        join fetch r.attachedPhotos.attachedPhotos
+        left join fetch r.attachedPhotos.attachedPhotos
         where r.id = :reviewId
     """)
-    fun findWithAttachedPhotosById(@Param("reviewId") reviewId: UUID)
+    fun findWithAttachedPhotosById(@Param("reviewId") reviewId: UUID): Review?
 }

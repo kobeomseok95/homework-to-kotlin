@@ -148,11 +148,14 @@ internal class ReviewEventServiceTest {
             content = "테스트",
         )
         every {
-            reviewRepository.findByIdOrNull(requestDto.reviewId)
+            reviewRepository.findWithAttachedPhotosById(requestDto.reviewId)
         } returns null
 
         assertThrows<ReviewNotFoundException> {
             reviewEventService.modify(requestDto)
+        }
+        verify {
+            reviewRepository.findWithAttachedPhotosById(requestDto.reviewId)
         }
     }
 
@@ -175,7 +178,7 @@ internal class ReviewEventServiceTest {
             attachedPhotos = AttachedPhotos(),
         )
         every {
-            reviewRepository.findByIdOrNull(requestDto.reviewId)
+            reviewRepository.findWithAttachedPhotosById(requestDto.reviewId)
         } returns review
         val pointHistories = listOf(
             PointHistory(
@@ -198,6 +201,10 @@ internal class ReviewEventServiceTest {
         assertThrows<ReviewerNotEqualsException> {
             reviewEventService.modify(requestDto)
         }
+        verify {
+            reviewRepository.findWithAttachedPhotosById(requestDto.reviewId)
+            pointCalculateService.calculateModifyReviewPoint(review, requestDto)
+        }
     }
 
     @DisplayName("리뷰 수정 - 성공 / 0점에서 3점으로 변화한다고 가정")
@@ -219,7 +226,7 @@ internal class ReviewEventServiceTest {
             attachedPhotos = AttachedPhotos(),
         )
         every {
-            reviewRepository.findByIdOrNull(requestDto.reviewId)
+            reviewRepository.findWithAttachedPhotosById(requestDto.reviewId)
         } returns review
         val pointHistories = listOf(
             PointHistory(
@@ -245,7 +252,7 @@ internal class ReviewEventServiceTest {
         reviewEventService.modify(requestDto)
 
         verify {
-            reviewRepository.findByIdOrNull(requestDto.reviewId)
+            reviewRepository.findWithAttachedPhotosById(requestDto.reviewId)
             pointCalculateService.calculateModifyReviewPoint(review, requestDto)
             pointHistoryRepository.saveAll(pointHistories)
             userPointService.changeUserPoint(requestDto.userId, pointHistories.sumOf { it.pointType.point })
