@@ -7,6 +7,6 @@ import javax.persistence.Embeddable
 @Embeddable
 class AttachedPhoto(
 
-    @Column
+    @Column(name = "ATTACHED_PHOTO_ID", columnDefinition = "BINARY(16)")
     val attachedPhotoId: UUID,
 )

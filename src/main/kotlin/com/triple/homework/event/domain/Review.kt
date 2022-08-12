@@ -12,13 +12,13 @@ import javax.persistence.Id
 class Review(
 
    @Id
-   @Column(name = "REVIEW_ID")
+   @Column(name = "REVIEW_ID", columnDefinition = "BINARY(16)")
    val id: UUID,
 
-   @Column(nullable = false)
+   @Column(nullable = false, columnDefinition = "BINARY(16)")
    val userId: UUID,
 
-   @Column(nullable = false)
+   @Column(nullable = false, columnDefinition = "BINARY(16)")
    var placeId: UUID,
 
    var content: String? = null,

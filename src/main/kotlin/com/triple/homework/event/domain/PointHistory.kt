@@ -12,6 +12,7 @@ class PointHistory(
     @Column(name = "POINT_HISTORY_ID")
     val id: Long? = null,
 
+    @Column(name = "USER_ID", columnDefinition = "BINARY(16)")
     val userId: UUID,
 
     @Enumerated(EnumType.STRING)

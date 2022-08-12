@@ -12,7 +12,7 @@ import javax.persistence.Table
 class User(
 
     @Id
-    @Column(name = "USER_ID")
+    @Column(name = "USER_ID", columnDefinition = "BINARY(16)")
     val id: UUID,
 
     var point: Long,
