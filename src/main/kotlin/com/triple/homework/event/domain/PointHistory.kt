@@ -1,6 +1,6 @@
 package com.triple.homework.event.domain
 
-import com.triple.homework.common.BaseTimeEntity
+import com.triple.homework.common.entity.BaseTimeEntity
 import java.util.*
 import javax.persistence.*
 

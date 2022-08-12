@@ -1,4 +1,4 @@
-package com.triple.homework.common
+package com.triple.homework.common.entity
 
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
